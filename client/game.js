@@ -16,6 +16,17 @@
   let localStream = null;
   let peers = {};
 
+  const socket = getSocket();
+
+socket.on("voice-ice", async ({ from, candidate }) => {
+  const pc = peers[from];
+  if (!pc) return;
+
+  try {
+    await pc.addIceCandidate(candidate);
+  } catch (e) {}
+});
+
   function createPeerConnection(targetId, stream) {
 
   const pc = new RTCPeerConnection({
