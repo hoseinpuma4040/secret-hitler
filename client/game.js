@@ -15,38 +15,46 @@
   let localVote = null;
   let localStream = null;
   let peers = {};
-  function createPeerConnection(targetId, stream) {
-  const pc = new RTCPeerConnection();
 
-  stream.getTracks().forEach(track => {
-    pc.addTrack(track, stream);
+  function createPeerConnection(targetId, stream) {
+
+  const pc = new RTCPeerConnection({
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject"
+      }
+    ]
   });
+
+  if (stream) {
+    stream.getTracks().forEach(track => {
+      pc.addTrack(track, stream);
+    });
+  }
+
+  pc.ontrack = (event) => {
+    const remoteAudio = document.createElement("audio");
+    remoteAudio.srcObject = event.streams[0];
+    remoteAudio.autoplay = true;
+  };
 
   pc.onicecandidate = (event) => {
     if (event.candidate) {
-      getSocket().emit("voice-candidate", {
+      getSocket()?.emit("voice-ice", {
         targetId,
-        candidate: event.candidate,
+        candidate: event.candidate
       });
     }
   };
 
-  pc.ontrack = (event) => {
-    let audio = document.getElementById("audio-" + targetId);
-
-    if (!audio) {
-      audio = document.createElement("audio");
-      audio.id = "audio-" + targetId;
-      audio.autoplay = true;
-      document.body.appendChild(audio);
-    }
-
-    audio.srcObject = event.streams[0];
-  };
-
   peers[targetId] = pc;
+
   return pc;
 }
+
 
 async function initMic() {
   if (localStream) return localStream;
