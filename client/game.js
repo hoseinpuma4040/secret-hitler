@@ -503,36 +503,38 @@ async function initMic() {
   if (state.phase === "discussion") {
   const speaker = state.discussionSpeakerId;
 
+  if (!window.voiceInitialized) {
+    window.voiceInitialized = true;
+
+    initMic().then(async (stream) => {
+      if (!stream) return;
+
+      const socket = getSocket();
+
+      for (const p of currentGameState.players) {
+        if (p.id === me) continue;
+
+        if (peers[p.id]) continue;
+
+        const pc = createPeerConnection(p.id, stream);
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        socket.emit("voice-offer", {
+          targetId: p.id,
+          offer,
+        });
+      }
+    });
+  }
+
   if (speaker === me) {
     actionPromptEl.textContent = "Your turn to speak (Pass to skip)";
     addButton("Pass", "btn-secondary", () => getSocket()?.emit("discussionPass"));
 
-    if (!window.voiceInitialized) {
-      window.voiceInitialized = true;
-
-      initMic().then(async (stream) => {
-        if (!stream) return;
-
-        stream.getTracks().forEach(track => track.enabled = true);
-
-        const socket = getSocket();
-
-        for (const p of currentGameState.players) {
-          if (p.id === me) continue;
-
-          if (peers[p.id]) continue;
-
-          const pc = createPeerConnection(p.id, stream);
-
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-
-          socket.emit("voice-offer", {
-            targetId: p.id,
-            offer,
-          });
-        }
-      });
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.enabled = true);
     }
 
   } else {
