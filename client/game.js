@@ -16,7 +16,31 @@
   let localStream = null;
   let peers = {};
 
-  const socket = getSocket();
+const socket = getSocket();
+
+socket.on("voice-offer", async ({ from, offer }) => {
+  const stream = await initMic();
+  if (!stream) return;
+
+  const pc = createPeerConnection(from, stream);
+
+  await pc.setRemoteDescription(offer);
+
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+
+  socket.emit("voice-answer", {
+    targetId: from,
+    answer,
+  });
+});
+
+socket.on("voice-answer", async ({ from, answer }) => {
+  const pc = peers[from];
+  if (!pc) return;
+
+  await pc.setRemoteDescription(answer);
+});
 
 socket.on("voice-ice", async ({ from, candidate }) => {
   const pc = peers[from];
@@ -47,9 +71,16 @@ socket.on("voice-ice", async ({ from, candidate }) => {
   }
 
   pc.ontrack = (event) => {
-    const remoteAudio = document.createElement("audio");
-    remoteAudio.srcObject = event.streams[0];
-    remoteAudio.autoplay = true;
+    let audio = document.getElementById("audio-" + targetId);
+
+if (!audio) {
+  audio = document.createElement("audio");
+  audio.id = "audio-" + targetId;
+  audio.autoplay = true;
+  document.body.appendChild(audio);
+}
+
+audio.srcObject = event.streams[0];
   };
 
   pc.onicecandidate = (event) => {
