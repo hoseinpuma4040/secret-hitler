@@ -1,0 +1,16 @@
+{
+  "name": "secret-hitler",
+  "version": "1.0.0",
+  "description": "Multiplayer Secret Hitler style web game",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "MIN_PLAYERS=2 node server/server.js"
+  },
+  "keywords": ["secret-hitler", "multiplayer", "socket.io"],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Secret Hitler</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="lobbyScreen" class="page">
+      <article class="card">
+        <header class="card-header">
+          <h1 class="title">Secret Hitler</h1>
+          <p class="subtitle">Online lobby</p>
+        </header>
+
+        <section id="lobbyForm" class="lobby-form">
+          <label class="field">
+            <span class="label">Player name</span>
+            <input
+              id="playerName"
+              type="text"
+              maxlength="24"
+              placeholder="Your name"
+              autocomplete="nickname"
+            />
+          </label>
+
+          <label class="field">
+            <span class="label">Room code</span>
+            <input
+              id="roomCode"
+              type="text"
+              maxlength="6"
+              placeholder="Enter code to join"
+              autocomplete="off"
+              autocapitalize="characters"
+            />
+          </label>
+
+          <div class="btn-row">
+            <button id="createRoomBtn" type="button" class="btn btn-primary">
+              Create Room
+            </button>
+            <button id="joinRoomBtn" type="button" class="btn btn-secondary">
+              Join Room
+            </button>
+          </div>
+
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="roomView" class="room-view hidden" aria-label="Current room">
+          <div class="room-code-block">
+            <span class="label">Room code</span>
+            <p id="roomCodeDisplay" class="room-code"></p>
+            <button id="copyRoomCodeBtn" type="button" class="btn btn-ghost btn-sm">
+              Copy code
+            </button>
+          </div>
+
+          <div class="players-block">
+            <div class="players-header">
+              <h2 class="section-title">Players</h2>
+              <span id="playerCount" class="player-count"></span>
+            </div>
+            <ul id="playerList" class="player-list"></ul>
+            <p id="startHint" class="hint">5–10 players required to start</p>
+          </div>
+
+          <button id="startGameBtn" type="button" class="btn btn-start hidden">
+            Start Game
+          </button>
+        </section>
+      </article>
+    </div>
+
+    <div id="roleRevealScreen" class="role-reveal hidden" aria-live="assertive">
+      <div class="role-reveal-noise" aria-hidden="true"></div>
+      <div class="role-reveal-content">
+        <p class="role-warning">Private — do not share this screen</p>
+        <h2 id="roleTitle" class="role-title"></h2>
+        <p id="roleDescription" class="role-description"></p>
+        <div id="roleTeammates" class="role-teammates hidden"></div>
+        <p class="role-timer" id="roleTimer">Continuing…</p>
+      </div>
+    </div>
+
+    <div id="gameBoardScreen" class="game-board hidden">
+      <header class="board-top">
+        <div class="board-top-row">
+          <span class="board-label">Room</span>
+          <span id="boardRoomCode" class="board-room-code"></span>
+        </div>
+        <div class="board-top-row">
+          <span class="board-label">Round</span>
+          <span id="boardRound" class="board-round"></span>
+        </div>
+      </header>
+
+      <div id="roleReminder" class="role-reminder hidden" aria-label="Your role"></div>
+      <div id="phaseBanner" class="phase-banner">Waiting…</div>
+      <p id="announcementBanner" class="announcement-banner hidden"></p>
+
+      <section class="policy-section">
+        <div class="track-block">
+          <h3 class="track-title track-liberal">Liberal policies</h3>
+          <div id="liberalTrack" class="track-slots"></div>
+        </div>
+        <div class="track-block">
+          <h3 class="track-title track-fascist">Fascist policies</h3>
+          <div id="fascistTrack" class="track-slots fascist-track"></div>
+        </div>
+        <p class="election-tracker">
+          Failed elections: <span id="electionTracker">0</span> / 3
+        </p>
+      </section>
+
+      <section class="government-section">
+        <h3 class="section-heading">Government</h3>
+        <div class="gov-cards">
+          <div class="gov-card">
+            <span class="gov-label">President</span>
+            <span id="presidentName" class="gov-name">—</span>
+          </div>
+          <div class="gov-card">
+            <span class="gov-label">Chancellor nominee</span>
+            <span id="chancellorName" class="gov-name">—</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="board-players-section">
+        <h3 class="section-heading">Players</h3>
+        <ul id="boardPlayerList" class="board-player-list"></ul>
+      </section>
+
+      <section class="action-area" id="actionArea">
+        <p id="actionPrompt" class="action-prompt">Waiting for game…</p>
+        <div id="actionButtons" class="action-buttons"></div>
+        <div id="reactionBar" class="reaction-bar hidden">
+          <button type="button" class="reaction-btn" data-emoji="👍">👍</button>
+          <button type="button" class="reaction-btn" data-emoji="🤨">🤨</button>
+          <button type="button" class="reaction-btn" data-emoji="😳">😳</button>
+          <button type="button" class="reaction-btn" data-emoji="❌">❌</button>
+        </div>
+        <div id="reactionsFeed" class="reactions-feed"></div>
+      </section>
+    </div>
+
+    <div id="privateOverlay" class="private-overlay hidden">
+      <div class="private-card">
+        <h3 id="privateTitle">Private info</h3>
+        <div id="privateContent"></div>
+        <button id="privateCloseBtn" type="button" class="btn btn-primary">Continue</button>
+      </div>
+    </div>
+
+    <div id="winOverlay" class="win-overlay hidden">
+      <div class="win-card">
+        <h2 id="winTitle"></h2>
+        <p id="winReason"></p>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
