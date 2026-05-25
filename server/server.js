@@ -128,8 +128,8 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("voice-candidate", ({ targetId, candidate }) => {
-    io.to(targetId).emit("voice-candidate", {
+  socket.on("voice-ice", ({ targetId, candidate }) => {
+    io.to(targetId).emit("voice-ice", {
       from: socket.id,
       candidate,
     });
