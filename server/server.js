@@ -496,14 +496,25 @@ io.on("connection", (socket) => {
     callback?.({ ok: true });
   });
 
-  socket.on("disconnect", () => {
-    const roomId = socket.data.roomId;
-    if (!roomId) return;
+   socket.on("disconnect", () => {
+  const roomId = socket.data.roomId;
+  if (!roomId) return;
+
+  console.log("Player disconnected (waiting 10s)...");
+
+  setTimeout(() => {
+    const stillDisconnected = !io.sockets.sockets.get(socket.id);
+
+    if (!stillDisconnected) {
+      console.log("Player reconnected ✅");
+      return;
+    }
+
+    console.log("Player really left ❌");
 
     const room = rooms.get(roomId);
     if (!room) return;
 
-    game.clearPhaseTimer(room);
     room.players.delete(socket.id);
 
     if (room.players.size === 0) {
@@ -516,23 +527,35 @@ io.on("connection", (socket) => {
     }
 
     if (room.game?.started) {
-      room.game.alivePlayers = room.game.alivePlayers.filter((id) => room.players.has(id));
+
+      game.clearPhaseTimer(room);
+
+      room.game.alivePlayers = room.game.alivePlayers.filter((id) =>
+        room.players.has(id)
+      );
+
       delete room.game.roles[socket.id];
-      room.game.playerOrder = room.game.playerOrder.filter((id) => room.players.has(id));
+
+      room.game.playerOrder = room.game.playerOrder.filter((id) =>
+        room.players.has(id)
+      );
 
       if (room.game.presidentId === socket.id) {
         room.game.presidentId = room.game.alivePlayers[0] || null;
       }
+
       if (room.game.chancellorNomineeId === socket.id) {
         room.game.chancellorNomineeId = null;
       }
 
       emitAll(room);
-      return;
+
+    } else {
+      io.to(roomId).emit("roomUpdated", getPublicRoom(room));
     }
 
-    io.to(roomId).emit("roomUpdated", getPublicRoom(room));
-  });
+  }, 10000);
+});
   
     socket.on("restartGame", (_, callback) => {
   console.log("RESTART GAME TRIGGERED");
@@ -543,16 +566,13 @@ io.on("connection", (socket) => {
     return;
   }
 
-  // فقط host بتونه ریست کنه
   if (room.hostId !== socket.id) {
     callback?.({ ok: false, error: "Only host can restart" });
     return;
   }
 
-  // ریست کامل game
   room.game = null;
 
-  // broadcast وضعیت جدید روم
   io.to(room.id).emit("roomUpdated", getPublicRoom(room));
 
   callback?.({ ok: true });

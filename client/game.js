@@ -18,6 +18,20 @@
 
 const socket = getSocket();
 
+socket.on("connect", () => {
+  console.log("Reconnected ✅");
+
+  socket.emit("requestGameState");
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    console.log("User came back ✅");
+
+    socket.emit("requestGameState");
+  }
+});
+
 socket.on("voice-offer", async ({ from, offer }) => {
   const stream = await initMic();
   if (!stream) return;
