@@ -1,170 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Secret Hitler</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="lobbyScreen" class="page">
-      <article class="card">
-        <header class="card-header">
-          <h1 class="title">Secret Hitler</h1>
-          <p class="subtitle">Online lobby</p>
-        </header>
+<head>
+  <meta charset="UTF-8">
+  <title>Secret Hitler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-        <section id="lobbyForm" class="lobby-form">
-          <label class="field">
-            <span class="label">Player name</span>
-            <input
-              id="playerName"
-              type="text"
-              maxlength="24"
-              placeholder="Your name"
-              autocomplete="nickname"
-            />
-          </label>
+<body>
 
-          <label class="field">
-            <span class="label">Room code</span>
-            <input
-              id="roomCode"
-              type="text"
-              maxlength="6"
-              placeholder="Enter code to join"
-              autocomplete="off"
-              autocapitalize="characters"
-            />
-          </label>
+<h1>Secret Hitler</h1>
 
-          <div class="btn-row">
-            <button id="createRoomBtn" type="button" class="btn btn-primary">
-              Create Room
-            </button>
-            <button id="joinRoomBtn" type="button" class="btn btn-secondary">
-              Join Room
-            </button>
-          </div>
+<!-- ===== LOBBY ===== -->
+<div id="lobby">
+  <h2>Online lobby</h2>
 
-          <p id="status" class="status" role="status" aria-live="polite"></p>
-        </section>
+  <input id="playerNameInput" placeholder="Player name">
+  <input id="roomCodeInput" placeholder="Room code">
 
-        <section id="roomView" class="room-view hidden" aria-label="Current room">
-          <div class="room-code-block">
-            <span class="label">Room code</span>
-            <p id="roomCodeDisplay" class="room-code"></p>
-            <button id="copyRoomCodeBtn" type="button" class="btn btn-ghost btn-sm">
-              Copy code
-            </button>
-          </div>
+  <br><br>
 
-          <div class="players-block">
-            <div class="players-header">
-              <h2 class="section-title">Players</h2>
-              <span id="playerCount" class="player-count"></span>
-            </div>
-            <ul id="playerList" class="player-list"></ul>
-            <p id="startHint" class="hint">5–10 players required to start</p>
-          </div>
+  <button id="createRoomBtn">Create Room</button>
+  <button id="joinRoomBtn">Join Room</button>
 
-          <button id="startGameBtn" type="button" class="btn btn-start hidden">
-            Start Game
-          </button>
-        </section>
-      </article>
-    </div>
+  <h3>Room code</h3>
+  <div id="roomCodeDisplay">—</div>
+  <button id="copyCodeBtn">Copy code</button>
 
-    <div id="roleRevealScreen" class="role-reveal hidden" aria-live="assertive">
-      <div class="role-reveal-noise" aria-hidden="true"></div>
-      <div class="role-reveal-content">
-        <p class="role-warning">Private — do not share this screen</p>
-        <h2 id="roleTitle" class="role-title"></h2>
-        <p id="roleDescription" class="role-description"></p>
-        <div id="roleTeammates" class="role-teammates hidden"></div>
-        <p class="role-timer" id="roleTimer">Continuing…</p>
+  <h3>Players</h3>
+  <ul id="playerList"></ul>
+
+  <p>5–10 players required to start</p>
+  <button id="startGameBtn">Start Game</button>
+
+  <p><b>Private — do not share this screen</b></p>
+</div>
+
+<hr>
+
+<!-- ===== GAME ===== -->
+<div id="game" style="display: none;">
+
+  <h3>Room: <span id="boardRoomCode">—</span></h3>
+  <h3>Round: <span id="boardRound">—</span></h3>
+
+  <p id="gameStatus">Waiting…</p>
+
+  <!-- ===== BOARD ===== -->
+  <div class="board">
+
+    <!-- LIBERAL -->
+    <div class="board-section liberal">
+      <div class="board-title">LIBERAL</div>
+      <div class="track liberal-track" id="liberalTrack">
+        <div class="slot"></div>
+        <div class="slot"></div>
+        <div class="slot"></div>
+        <div class="slot"></div>
+        <div class="slot"></div>
       </div>
     </div>
 
-    <div id="gameBoardScreen" class="game-board hidden">
-      <header class="board-top">
-        <div class="board-top-row">
-          <span class="board-label">Room</span>
-          <span id="boardRoomCode" class="board-room-code"></span>
-        </div>
-        <div class="board-top-row">
-          <span class="board-label">Round</span>
-          <span id="boardRound" class="board-round"></span>
-        </div>
-      </header>
-
-      <div id="roleReminder" class="role-reminder hidden" aria-label="Your role"></div>
-      <div id="phaseBanner" class="phase-banner">Waiting…</div>
-      <p id="announcementBanner" class="announcement-banner hidden"></p>
-
-      <section class="policy-section">
-        <div class="track-block">
-          <h3 class="track-title track-liberal">Liberal policies</h3>
-          <div id="liberalTrack" class="track-slots"></div>
-        </div>
-        <div class="track-block">
-          <h3 class="track-title track-fascist">Fascist policies</h3>
-          <div id="fascistTrack" class="track-slots fascist-track"></div>
-        </div>
-        <p class="election-tracker">
-          Failed elections: <span id="electionTracker">0</span> / 3
-        </p>
-      </section>
-
-      <section class="government-section">
-        <h3 class="section-heading">Government</h3>
-        <div class="gov-cards">
-          <div class="gov-card">
-            <span class="gov-label">President</span>
-            <span id="presidentName" class="gov-name">—</span>
-          </div>
-          <div class="gov-card">
-            <span class="gov-label">Chancellor nominee</span>
-            <span id="chancellorName" class="gov-name">—</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="board-players-section">
-        <h3 class="section-heading">Players</h3>
-        <ul id="boardPlayerList" class="board-player-list"></ul>
-      </section>
-
-      <section class="action-area" id="actionArea">
-        <p id="actionPrompt" class="action-prompt">Waiting for game…</p>
-        <div id="actionButtons" class="action-buttons"></div>
-        <div id="reactionBar" class="reaction-bar hidden">
-          <button type="button" class="reaction-btn" data-emoji="👍">👍</button>
-          <button type="button" class="reaction-btn" data-emoji="🤨">🤨</button>
-          <button type="button" class="reaction-btn" data-emoji="😳">😳</button>
-          <button type="button" class="reaction-btn" data-emoji="❌">❌</button>
-        </div>
-        <div id="reactionsFeed" class="reactions-feed"></div>
-      </section>
-    </div>
-
-    <div id="privateOverlay" class="private-overlay hidden">
-      <div class="private-card">
-        <h3 id="privateTitle">Private info</h3>
-        <div id="privateContent"></div>
-        <button id="privateCloseBtn" type="button" class="btn btn-primary">Continue</button>
+    <!-- FASCIST -->
+    <div class="board-section fascist">
+      <div class="board-title">FASCIST</div>
+      <div class="track fascist-track" id="fascistTrack">
+        <div class="slot"></div>
+        <div class="slot investigate"></div>
+        <div class="slot peek"></div>
+        <div class="slot kill"></div>
+        <div class="slot kill"></div>
+        <div class="slot hitler"></div>
       </div>
     </div>
 
-    <div id="winOverlay" class="win-overlay hidden">
-      <div class="win-card">
-        <h2 id="winTitle"></h2>
-        <p id="winReason"></p>
-      </div>
+    <!-- ELECTION TRACKER -->
+    <div class="election-tracker" id="electionTracker">
+      <div class="tracker-slot"></div>
+      <div class="tracker-slot"></div>
+      <div class="tracker-slot"></div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
-    <script src="game.js"></script>
-  </body>
+  </div>
+
+  <!-- ===== GOVERNMENT ===== -->
+  <h3>Government</h3>
+  <p>President: <span id="presidentName">—</span></p>
+  <p>Chancellor: <span id="chancellorName">—</span></p>
+
+  <!-- ===== PLAYERS ===== -->
+  <h3>Players</h3>
+  <ul id="boardPlayerList"></ul>
+
+  <!-- ===== ACTIONS ===== -->
+  <div id="actionPrompt"></div>
+  <div id="actionButtons"></div>
+
+  <!-- ===== REACTIONS ===== -->
+  <div id="reactions">👍 🤨 😳 ❌</div>
+
+  <!-- ===== PRIVATE ===== -->
+  <h3>Private info</h3>
+  <div id="privateInfo"></div>
+
+  <button id="continueBtn">Continue</button>
+
+</div>
+
+<!-- ✅ IMPORTANT (socket + game) -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js"></script>
+
+</body>
 </html>

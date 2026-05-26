@@ -1018,3 +1018,95 @@ button, .btn {
   border: 2px solid #888;
 }
 
+.board {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.board-section {
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.board-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+}
+
+.track {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.slot {
+  width: 80px;
+  height: 110px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: white;
+  position: relative;
+}
+
+.liberal {
+  background: #cfe8f3;
+}
+
+.liberal .slot {
+  border-color: #0077b6;
+}
+
+.fascist {
+  background: #f4b4b4;
+}
+
+.fascist .slot {
+  border-color: #a00000;
+}
+
+.slot.investigate::after {
+  content: "🔍";
+  position: absolute;
+  top: 35%;
+  left: 35%;
+}
+
+.slot.peek::after {
+  content: "👁";
+  position: absolute;
+  top: 35%;
+  left: 35%;
+}
+
+.slot.kill::after {
+  content: "🔪";
+  position: absolute;
+  top: 35%;
+  left: 35%;
+}
+
+.slot.hitler::after {
+  content: "☠";
+  position: absolute;
+  top: 35%;
+  left: 35%;
+}
+
+.election-tracker {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.tracker-slot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eee;
+  border: 2px solid #333;
+}
